@@ -7,6 +7,7 @@ import { Bot } from "@/components/animate-ui/icons/bot"
 import { BotOff } from "@/components/animate-ui/icons/bot-off"
 import { ManagementBar } from '@/components/animate-ui/components/community/management-bar';
 import { motion } from 'motion/react';
+import Sidebar from './Sidebar';
 
 import {
     Table,
@@ -22,10 +23,11 @@ const page = () => {
 
     const accuracy = 92.3;
 
-    const file = {
-        "media_type": "video",
-        "file_url": "flicker_test_5.mp4"
-    }
+    const [file, setFile] = useState(null);
+    // const file = {
+    //     "media_type": "image",
+    //     "file_url": "flicker_test_1.jpg"
+    // }
 
     const face_data = [
         {
@@ -54,7 +56,7 @@ const page = () => {
     }
 
     return (
-        <div className='flex divide-x divide-white bg-black '>
+        <div className='flex divide-x-[0.5px] divide-neutral-400 bg-black '>
             <div className=' absolute top-0 left-0 m-0 bg-white/30 backdrop-blur-xl w-screen h-14 z-20 px-5 py-2 flex items-center border-b '>
 
                 <div className='text-white font-bold text-xl'>
@@ -63,135 +65,36 @@ const page = () => {
             </div>
 
             {/* sidebar */}
-            <div className=' pt-20 px-5 w-[30vw] bg-linear-90 from-blue-900 to-black '>
-
-                <div className='sticky left-0 top-5  text-white flex flex-col items-center gap-5 '>
-                    <div className='bg-white/20 pb-4 px-3 rounded-lg w-full'>
-                        <Table className={""}>
-                            <TableBody className={""}>
-                                <TableRow className={"hover:bg-transparent border-0 "}>
-                                    <TableHead className={"text-white text-center"}>AI generated</TableHead>
-                                    <TableHead className={"text-white text-center mx-2"}>Suspicious</TableHead>
-                                    <TableHead className={"text-white text-center mx-2"}></TableHead>
-                                    <TableHead className={"text-white text-center mx-2"}>Harmful</TableHead>
-                                </TableRow>
-                                <TableRow className={"hover:bg-transparent"}>
-                                    <TableHead className={"text-white text-center font-bold "}>5</TableHead>
-                                    <TableHead className={"text-white bg-radial from-orange-800 to-orange-500 rounded-full text-center font-bold mx-2"}>4</TableHead>
-                                    <TableHead className={""}></TableHead>
-                                    <TableHead className={"text-white bg-radial from-red-800 to-red-500 rounded-full text-center font-bold mx-2"}>4</TableHead>
-                                </TableRow>
-                            </TableBody>
-                        </Table>
-                    </div>
-
-                    <div className='bg-white/20 hover:bg-white/25 backdrop-blur-md p-3 rounded-lg w-full min-h-24 cursor-pointer transition-colors '>
-                        <div className='w-full flex items-center justify-between'>
-                            <div className='flex flex-col gap-5'>
-                                <div className='text-xl'>
-                                    Case-URL/Filename-Here
-                                </div>
-                                <div className='flex flex-wrap gap-1'>
-                                    <span className='text-sm bg-amber-600 px-3 py-0.5 rounded-3xl '>
-                                        AI
-                                    </span>
-                                    <span className='text-sm  px-3 py-0.5 rounded-3xl '>
-                                        Violent
-                                    </span>
-                                    <span className='text-sm  px-3 py-0.5 rounded-3xl '>
-                                        removal required
-                                    </span>
-                                </div>
-                            </div>
-                            <span className='text-4xl font-thin'>
-                                1
-                            </span>
-                        </div>
-                        <div>
-
-                        </div>
-                    </div>
-
-                    <div className='bg-white/20 hover:bg-white/25 backdrop-blur-md p-3 rounded-lg w-full min-h-24 cursor-pointer transition-colors '>
-                        <div className='w-full flex items-center justify-between'>
-                            <div className='flex flex-col gap-5'>
-                                <div className='text-xl'>
-                                    Case-URL/Filename-Here
-                                </div>
-                                <div className='flex flex-wrap gap-1'>
-                                    <span className='text-sm bg-amber-600 px-3 py-0.5 rounded-3xl '>
-                                        AI
-                                    </span>
-                                    <span className='text-sm  px-3 py-0.5 rounded-3xl '>
-                                        Violent
-                                    </span>
-                                    <span className='text-sm  px-3 py-0.5 rounded-3xl '>
-                                        removal required
-                                    </span>
-                                </div>
-                            </div>
-                            <span className='text-4xl font-thin'>
-                                2
-                            </span>
-                        </div>
-                        <div>
-
-                        </div>
-                    </div>
-
-                    <div className='bg-white/20 hover:bg-white/25 backdrop-blur-md p-3 rounded-lg w-full min-h-24 cursor-pointer transition-colors '>
-                        <div className='w-full flex items-center justify-between'>
-                            <div className='flex flex-col gap-5'>
-                                <div className='text-xl'>
-                                    Case-URL/Filename-Here
-                                </div>
-                                <div className='flex flex-wrap gap-1'>
-                                    <span className='text-sm bg-amber-600 px-3 py-0.5 rounded-3xl '>
-                                        AI
-                                    </span>
-                                    <span className='text-sm  px-3 py-0.5 rounded-3xl '>
-                                        Violent
-                                    </span>
-                                    <span className='text-sm  px-3 py-0.5 rounded-3xl '>
-                                        removal required
-                                    </span>
-                                </div>
-                            </div>
-                            <span className='text-4xl font-thin'>
-                                3
-                            </span>
-                        </div>
-                        <div>
-
-                        </div>
-                    </div>
-
-
-
-                </div>
-            </div>
+            <Sidebar setFile={setFile} />
 
             {/* case review */}
             <div className=" pt-20 w-full p-5 bg-linear-90 to-blue-900 from-black text-white ">
 
                 <div className="flex gap-5 ">
-                    <Card className={" max-w-1/2 max-h-[70vh] overflow-hidden aspect-auto p-0 bg-white/10 backdrop-blur-xl bg-radial-[at_50%_75%] from-black/50 to-transparent border-0 "} >
+                    <Card className={" w-full max-h-[70vh] overflow-hidden aspect-auto p-0 bg-white/10 backdrop-blur-xl bg-radial-[at_50%_75%] from-black/50 to-transparent border-0 "} >
 
+                        {file === null && (
+                            <div className="w-full h-full flex items-center justify-center">
+                                <div className="text-white font-bold text-2xl">
+                                    No file selected
+                                </div>
+                            </div>
+                        )}
                         {
-                            file["media_type"] === "image" &&
+                            file && file["media_type"] === "image" &&
                             (
-                                <img src={file["file_url"]} className="w-full h-full" />
+                                <img src={file["file_url"]} className="w-full h-full object-contain" />
                             )
                         }
                         {
-                            file["media_type"] === "video" &&
+                            file && file["media_type"] === "video" &&
                             (
                                 <video controls src={file["file_url"]} className="w-full h-full" />
                             )
                         }
                     </Card>
 
-                    <div className={"  max-w-1/2 w-full text-white bg-transparent shadow-none py-0 flex flex-col gap-5"}>
+                    <div className={" min-w-[400px] text-white bg-transparent shadow-none py-0 flex flex-col gap-5"}>
                         {/* OVERALL RESULT */}
                         <Card className={"p-5 text-white bg-white/10 backdrop-blur-lg border-0 "}>
                             <div className="font-bold text-2xl ">
