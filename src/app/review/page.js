@@ -20,39 +20,79 @@ import {
 } from "@/components/ui/table"
 
 const page = () => {
-
-    const accuracy = 92.3;
-
     const [file, setFile] = useState(null);
-    // const file = {
-    //     "media_type": "image",
-    //     "file_url": "flicker_test_1.jpg"
-    // }
+    const [CaseFiles, setCaseFiles] = useState([]);
 
-    const face_data = [
-        {
-            "name": "Person-1",
-            "image": "/faces/face_1.png",
-            "estimate_age": "32",
-            "ai_prediction": false
-        },
-        {
-            "name": "Person-2",
-            "image": "/faces/face_2.png",
-            "estimate_age": "60",
-            "ai_prediction": false
-        },
-        {
-            "name": "Person-3",
-            "image": "/faces/face_3.png",
-            "estimate_age": "4",
-            "ai_prediction": true
+    useEffect(() => {
+        const fetch_active_files = async () => {
+            const response = await fetch("/api/get-active-files", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+            const data = await response.json();
+            setCaseFiles(data);
+            console.log(data);
         }
-    ]
 
-    const labels = {
-        "suspicious": ["NSFW", "CSAM", "Weapons", "Political"],
-        "events_n_actions": ["Speaking", "Watching"]
+        if (!CaseFiles.length) {
+            fetch_active_files();
+        }
+
+    }, [CaseFiles]);
+
+    const mark_for_review = async () => {
+        try {
+            const response = await fetch(`/api/mark-for-review`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    image_url: file?.image_url,
+                    current_mark_status: file?.marked,
+                }),
+            })
+            const data = await response.json();
+            console.log(data);
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
+    const go_to_file = (direction) => {
+        if (direction === "next") {
+            const index = CaseFiles.findIndex((filedata) => filedata.image_url === file.image_url);
+            if (index !== CaseFiles.length - 1) {
+                setFile(CaseFiles[index + 1]);
+            }
+        } else {
+            const index = CaseFiles.findIndex((filedata) => filedata.image_url === file.image_url);
+            if (index !== 0) {
+                setFile(CaseFiles[index - 1]);
+            }
+        }
+    }
+    const submit_comment_review = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await fetch(`/api/comment-review`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    image_url: file?.image_url,
+                    comment: file?.review_comment,
+                }),
+            })
+            const data = await response.json();
+            console.log(data);
+        }
+        catch (error) {
+            console.log(error);
+        }
     }
 
     return (
@@ -65,7 +105,7 @@ const page = () => {
             </div>
 
             {/* sidebar */}
-            <Sidebar setFile={setFile} />
+            <Sidebar CaseFiles={CaseFiles} setCaseFiles={setCaseFiles} setFile={setFile} />
 
             {/* case review */}
             <div className=" pt-20 w-full p-5 bg-linear-90 to-blue-900 from-black text-white ">
@@ -83,13 +123,13 @@ const page = () => {
                         {
                             file && file["media_type"] === "image" &&
                             (
-                                <img src={file["file_url"]} className="w-full h-full object-contain" />
+                                <img src={file["image_url"]} className="w-full h-full object-contain" />
                             )
                         }
                         {
                             file && file["media_type"] === "video" &&
                             (
-                                <video controls src={file["file_url"]} className="w-full h-full" />
+                                <video controls src={file["image_url"]} className="w-full h-full" />
                             )
                         }
                     </Card>
@@ -101,7 +141,10 @@ const page = () => {
                                 Agent Review
                             </div>
                             <div className="">
-                                No harmful activity or event detected
+                                {file?.agent_review ?
+                                    "Harmful activity or event detected" :
+                                    "No harmful activity or event detected"
+                                }
                             </div>
                         </Card>
 
@@ -112,17 +155,17 @@ const page = () => {
                             </div>
                             <div className="flex items-center justify-between">
                                 <div className="text">
-                                    Fully AI generated
+                                    {file?.ai_result?.result === "ai" ? "Fully AI generated" : "Not AI generated"}
                                 </div>
                                 <div className=' max-w-[220px]'>
                                     <div className="font-bold" >
-                                        Accuracy - {accuracy}%
+                                        Accuracy - {(file?.ai_result?.accuracy * 100).toFixed(2)}%
                                     </div>
                                     <div>
                                         <Progress
-                                            value={accuracy}
+                                            value={file?.ai_result ? (file.ai_result?.accuracy * 100) : 0}
                                             className={"w-full border border-white/30 "}
-                                            indicator_className={(accuracy > 60 ? " bg-linear-90 from-green-600 to-green-400" : accuracy > 40 ? "bg-linear-90 from-orange-600 to-orange-400" : "bg-linear-90 from-red-600 to-red-400")}
+                                            indicator_className={(((file?.ai_result) ? (file.ai_result?.accuracy * 100) : 0) > 60 ? " bg-linear-90 from-green-600 to-green-400" : file?.ai_result?.accuracy * 100 > 40 ? "bg-linear-90 from-orange-600 to-orange-400" : "bg-linear-90 from-red-600 to-red-400")}
                                         />
                                     </div>
                                 </div>
@@ -139,7 +182,7 @@ const page = () => {
                                     <div>Suspicious </div>
                                     <div className=" flex w-full flex-wrap gap-1">
                                         {
-                                            labels["suspicious"].map((val, idx) => (
+                                            file?.suspicious_labels?.map((val, idx) => (
                                                 <div
                                                     key={idx}
                                                     className=" bg-radial-[at_50%_75%] from-red-500 to-red-800 text-white font-bold px-2 py-1 w-fit rounded-full "
@@ -154,7 +197,7 @@ const page = () => {
                                     <div>Events and Actions </div>
                                     <div className=" flex w-full flex-wrap gap-1">
                                         {
-                                            labels["events_n_actions"].map((val, idx) => (
+                                            file?.action_labels?.map((val, idx) => (
                                                 <div
                                                     key={idx}
                                                     className="bg-radial-[at_50%_75%] from-blue-500 to-blue-800 text-white font-bold px-2 py-1 w-fit rounded-full "
@@ -179,58 +222,69 @@ const page = () => {
                             <TableRow className={"text-white hover:bg-black/0 border-0"}>
                                 <TableHead className={"w-[125px] text-white text-center text-lg"}>Faces</TableHead>
                                 <TableHead className={" text-white text-center text-lg"}>Estimate Age</TableHead>
-                                <TableHead className={" text-white text-center text-lg"}>AI detetcted</TableHead>
+                                <TableHead className={" text-white text-center text-lg"}>AI Detected</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody className={"border-0"}>
                             {
-                                face_data.map((val, idx) => {
-                                    return (
-                                        <TableRow key={idx} className={"border-0 hover:bg-black/20"}>
-                                            {/* FACES */}
-                                            <TableCell className=" flex flex-col items-center gap-2 py-5 ">
-                                                <div className='h-20 w-20 overflow-hidden rounded-full'>
-                                                    <img className='w-full h-full aspect-square object-cover' src={val["image"]} alt={val["name"]} />
-                                                </div>
-                                                <div>
-                                                    {val["name"]}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className={"text-center text-lg font-base"}>{val["estimate_age"]}</TableCell>
-                                            <TableCell className=" flex justify-center px-5">
-                                                {val["ai_prediction"] === true ? (
-                                                    <div className='w-16 h-16 flex items-center justify-center group rounded-xl bg-radial from-red-400 to-red-500 '>
-                                                        <Bot animateOnHover className={"size-10 group-hover"} />
+                                file?.faces_data?.length > 0 ? (
+                                    file?.faces_data?.map((val, idx) => {
+                                        return (
+                                            <TableRow key={idx} className={"border-0 hover:bg-black/20"}>
+                                                {/* FACES */}
+                                                <TableCell className="align-middle">
+                                                    <div className="flex flex-col items-center justify-center gap-2">
+                                                        <div className='h-20 w-20 overflow-hidden rounded-full border border-white/20'>
+                                                            <img className='w-full h-full aspect-square object-cover' src={val["face"]} alt={"Person " + (idx + 1)} />
+                                                        </div>
+                                                        <div className="text-sm">
+                                                            Person - {idx + 1}
+                                                        </div>
                                                     </div>
-                                                ) : (
-                                                    <div className='w-16 h-16 flex items-center justify-center group rounded-xl bg-radial from-green-400 to-green-500 '>
-                                                        <BotOff animateOnHover className={"size-10"} />
+                                                </TableCell>
+                                                <TableCell className={"text-center text-lg font-base align-middle"}>{val["estimate_age"]}</TableCell>
+                                                <TableCell className="align-middle px-5">
+                                                    <div className="flex items-center justify-center">
+                                                        {val["ai_prediction"] === true ? (
+                                                            <div className='w-16 h-16 flex items-center justify-center group rounded-xl bg-radial from-red-400 to-red-500 '>
+                                                                <Bot animateOnHover className={"size-10 group-hover"} />
+                                                            </div>
+                                                        ) : (
+                                                            <div className='w-16 h-16 flex items-center justify-center group rounded-xl bg-radial from-green-400 to-green-500 '>
+                                                                <BotOff animateOnHover className={"size-10"} />
+                                                            </div>
+                                                        )}
                                                     </div>
-                                                )}</TableCell>
-                                        </TableRow>
-                                    )
-                                })
-                            }
+                                                </TableCell>
+                                            </TableRow>
+                                        )
+                                    })
+                                ) : (
+                                    <TableRow className={" hover:bg-black/20"}>
+                                        <TableCell colSpan={3} className="h-96 text-xl font-thin text-center">
+                                            No faces detected
+                                        </TableCell>
+                                    </TableRow>
+                                )}
                         </TableBody>
                     </Table>
 
                     {/* </Card> */}
-
                     <Card className={" shadow-none w-full border-0 text-white flex flex-col items-end h-fit min-h-[300px] bg-transparent "}>
 
                         <div className='text-2xl font-bold w-full'>
                             Assess Review
                         </div>
                         <div className='w-full'>
-                            <ManagementBar className={"w-full"} />
+                            <ManagementBar mark_for_review={mark_for_review} go_to_file={go_to_file} total_pages={CaseFiles.length} className={"w-full"} />
                         </div>
-                        <div className='w-full bg-white/10 p-5 rounded-xl'>
+                        <form onSubmit={submit_comment_review} className='w-full bg-white/10 p-5 rounded-xl'>
                             <div className='text-xl'>
                                 Comment
                             </div>
 
                             <div className='py-2'>
-                                <textarea rows={6} className='w-full border-[0.1px] border-white/20 rounded-lg focus:inset-0 focus:outline-0 p-3 ' />
+                                <textarea value={file?.review_comment} onChange={(e) => setFile({ ...file, review_comment: e.target.value })} name="comment" rows={6} className='w-full border-[0.1px] border-white/20 rounded-lg focus:inset-0 focus:outline-0 p-3 ' />
                             </div>
 
                             <div className="w-full flex justify-end">
@@ -238,10 +292,10 @@ const page = () => {
                                     whileTap={{ scale: 0.975 }}
                                     className=" text-lg cursor-pointer flex h-10 w-fit items-center rounded-lg bg-neutral-200 px-2.5 py-2 text-neutral-600 "
                                 >
-                                    Submit
+                                    Save
                                 </motion.button>
                             </div>
-                        </div>
+                        </form>
                         {/*                         
                         <div className='flex flex-row gap-5 '>
                             <div className=' font-bold h-fit border border-red-700 bg-red-400 hover:bg-red-500 p-3 rounded-xl w-fit transition-all cursor-pointer '>

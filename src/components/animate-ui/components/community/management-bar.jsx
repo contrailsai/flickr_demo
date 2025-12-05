@@ -15,8 +15,6 @@ import { BadgeCheck } from '@/components/animate-ui/icons/badge-check';
 import { SlidingNumber } from '@/components/animate-ui/primitives/texts/sliding-number';
 import { motion } from 'motion/react';
 
-const TOTAL_PAGES = 10;
-
 const BUTTON_MOTION_CONFIG = {
   initial: 'rest',
   whileHover: 'hover',
@@ -46,15 +44,19 @@ const LABEL_TRANSITION = {
   damping: 25,
 };
 
-function ManagementBar() {
+function ManagementBar({ mark_for_review, go_to_file, total_pages }) {
+
+  const TOTAL_PAGES = total_pages;
   const [currentPage, setCurrentPage] = React.useState(1);
 
   const handlePrevPage = React.useCallback(() => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
+    go_to_file("prev");
   }, [currentPage]);
 
   const handleNextPage = React.useCallback(() => {
     if (currentPage < TOTAL_PAGES) setCurrentPage(currentPage + 1);
+    go_to_file("next");
   }, [currentPage]);
 
   return (
@@ -93,6 +95,7 @@ function ManagementBar() {
           >
             <motion.button
               whileTap={{ scale: 0.975 }}
+              onClick={mark_for_review}
               // {...BUTTON_MOTION_CONFIG}
               className=" cursor-pointer flex h-10 w-fit items-center space-x-2 whitespace-nowrap rounded-lg bg-neutral-200 dark:bg-neutral-600/80 px-2.5 py-2 text-neutral-600 dark:text-neutral-200"
               aria-label="mark_review">

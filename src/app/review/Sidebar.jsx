@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { CirclePlus } from "@/components/animate-ui/icons/circle-plus"
-
+import { Pin } from '@/components/animate-ui/icons/pin';
 import {
     Table,
     TableBody,
@@ -14,10 +14,8 @@ import {
 } from "@/components/ui/table"
 import { motion } from 'motion/react';
 
+const Sidebar = ({ CaseFiles, setCaseFiles, setFile }) => {
 
-const Sidebar = ({ setFile }) => {
-
-    const [CaseFiles, setCaseFiles] = useState([]);
     const [open_add, setOpenAdd] = useState(false);
 
     const Url_Submit = async (e) => {
@@ -66,25 +64,32 @@ const Sidebar = ({ setFile }) => {
                     <div className='w-full flex flex-col gap-5 items-center justify-center'>
                         {
                             CaseFiles.length > 0 ? (
-                                CaseFiles.map((file, index) => (
-                                    < div key={index}
+                                CaseFiles.map((filedata, index) => (
+                                    <div key={index}
                                         className='bg-white/20 hover:bg-white/25 backdrop-blur-md p-3 rounded-lg w-full min-h-24 cursor-pointer transition-colors '
-                                        onClick={() => setFile({ "media_type": "image", "file_url": file })}
+                                        onClick={() => setFile(filedata)}
                                     >
                                         <div className='w-full flex items-center justify-between'>
                                             <div className='flex flex-col gap-5'>
                                                 <div className='text-sm '>
-                                                    {file.split("/")[4]}
+                                                    {filedata?.image_url?.split("/")[4]}
                                                 </div>
-                                                <div className='flex flex-wrap gap-1'>
+                                                <div className='flex flex-wrap justify-between gap-1'>
+                                                    {filedata?.marked &&
+                                                        <span className='text-sm px-3 py-0.5 rounded-3xl '>
+                                                            <Pin fill="white" size={20} />
+                                                        </span>
+                                                    }
+
+
                                                     <span className='text-sm bg-amber-600 px-3 py-0.5 rounded-3xl '>
-                                                        AI
+                                                        {filedata?.ai_result?.result.toUpperCase()}
                                                     </span>
                                                     <span className='text-sm  px-3 py-0.5 rounded-3xl '>
-                                                        Violent
+                                                        {filedata?.agent_result === "bad" ? "Bad" : "Good"}
                                                     </span>
                                                     <span className='text-sm  px-3 py-0.5 rounded-3xl '>
-                                                        removal required
+                                                        {filedata?.media_type === "image" ? "Image" : "Video"}
                                                     </span>
                                                 </div>
                                             </div>
@@ -129,7 +134,6 @@ const Sidebar = ({ setFile }) => {
                         )
                     }
                 </div>
-
             </div>
         </div >
     );
