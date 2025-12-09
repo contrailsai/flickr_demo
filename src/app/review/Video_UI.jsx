@@ -240,7 +240,7 @@ export default function Result_UI({ results }) {
                                                 <div className={`w-full flex flex-col bg-white rounded-2xl overflow-hidden ${toggle_open === idx ? 'ml-0' : 'ml-8'} transition-all `}>
 
                                                     {/* PERSON's VIDEO SECTIONS */}
-                                                    < div className={` ${toggle_open === idx ? 'max-h-0' : 'max-h-72'} w-full min-w-[20vw] h-full pr-2 bg-white flex items-center relative rounded-xl overflow-hidden transition-all `}>
+                                                    < div className={` ${toggle_open === idx ? 'max-h-0' : 'max-h-72'} w-full min-w-[27vw] h-full pr-2 bg-white flex items-center relative rounded-xl overflow-hidden transition-all `}>
                                                         {/* REFERENCE LINE */}
                                                         <div className="bg-gray-300 w-full h-px" />
                                                         {
