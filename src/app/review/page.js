@@ -7,7 +7,7 @@ import { Bot } from "@/components/animate-ui/icons/bot"
 import { BotOff } from "@/components/animate-ui/icons/bot-off"
 import { ManagementBar } from '@/components/animate-ui/components/community/management-bar';
 import { motion } from 'motion/react';
-import Sidebar from './Sidebar';
+import SidebarLeft from './Sidebar';
 
 import {
     Table,
@@ -18,6 +18,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import Result_UI from './Video_UI'
 
 const page = () => {
     const [file, setFile] = useState(null);
@@ -25,15 +26,30 @@ const page = () => {
 
     useEffect(() => {
         const fetch_active_files = async () => {
-            const response = await fetch("/api/get-active-files", {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-            const data = await response.json();
-            setCaseFiles(data);
-            console.log(data);
+            let tries = 0;
+            while (tries < 5) {
+                try {
+                    const response = await fetch("/api/get-active-files", {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    });
+                    const data = await response.json();
+                    console.log(data, data.error);
+                    if (data.error !== undefined) {
+                        console.log(data.error);
+                        throw new Error(data.error);
+                    }
+                    setCaseFiles(data);
+                    console.log(data);
+                    break;
+                }
+                catch (error) {
+                    tries++;
+                    console.log(tries, error);
+                }
+            }
         }
 
         if (!CaseFiles.length) {
@@ -95,77 +111,164 @@ const page = () => {
         }
     }
 
-    return (
-        <div className='flex divide-x-[0.5px] divide-neutral-400 bg-black '>
-            <div className=' absolute top-0 left-0 m-0 bg-white/30 backdrop-blur-xl w-screen h-14 z-20 px-5 py-2 flex items-center border-b '>
+    const normalize_value = (prediction_value, threshold) => {
+        // NORMALIZE IT TO BE CORRECT   (0 - th) => (0, 0.5) and (th - 1) => (0.5 - 1) use y=mx+c to make the eqs
+        if (prediction_value > threshold) {
+            prediction_value = (0.5 * (prediction_value + 1) - threshold) / (1 - threshold);
+        }
+        else {
+            prediction_value = (0.5 * prediction_value) / (threshold);
+        }
+        return prediction_value;
+    }
 
-                <div className='text-white font-bold text-xl'>
+    return (
+        <div className='flex divide-x-[0.5px] divide-blue-600/50 '>
+            <div className=' absolute z-30 top-0 left-0 m-0 bg-blue-600/10 backdrop-blur-xl w-screen h-14 px-5 py-2 flex items-center justify-between border-b-[0.5px] border-blue-600/50 '>
+
+                {/* <div className='text-black font-bold text-xl'>
                     Cases Review
+                </div> */}
+                <div className='h-8'>
+                    <img className='w-full h-full object-cover ' src="flickr_logo.png" alt="flickr" />
+                </div>
+                <div className='flex items-center gap-2'>
+                    <div className=' h-11'>
+                        <img className='w-full h-full object-cover ' src="logo_long.png" alt="logo" />
+                    </div>
+                    {/* <div className='text-blue-700 font-bold text-3xl'>
+                        Contrails AI
+                    </div> */}
                 </div>
             </div>
 
             {/* sidebar */}
-            <Sidebar CaseFiles={CaseFiles} setCaseFiles={setCaseFiles} setFile={setFile} />
+            <SidebarLeft CaseFiles={CaseFiles} setCaseFiles={setCaseFiles} setFile={setFile} />
 
             {/* case review */}
-            <div className=" pt-20 w-full p-5 bg-linear-90 to-blue-900 from-black text-white ">
+            <div className=" mt-14 max-h-[90vh] overflow-auto w-full p-5 bg-linear-90 to-white from-white text-white ">
 
                 <div className="flex gap-5 ">
-                    <Card className={" w-full max-h-[70vh] overflow-hidden aspect-auto p-0 bg-white/10 backdrop-blur-xl bg-radial-[at_50%_75%] from-black/50 to-transparent border-0 "} >
+                    <Card className={" w-full flex items-center justify-center shadow-none min-h-[30vh] overflow-hidden aspect-auto p-0 bg-muted text-black backdrop-blur-xl border "} >
 
                         {file === null && (
                             <div className="w-full h-full flex items-center justify-center">
-                                <div className="text-white font-bold text-2xl">
-                                    No file selected
+                                <div className="text-black/50 font-light text-2xl">
+                                    No File Selected
                                 </div>
                             </div>
                         )}
                         {
                             file && file["media_type"] === "image" &&
                             (
-                                <img src={file["image_url"]} className="w-full h-full object-contain" />
+                                <img src={file["image_url"]} className="w-full h-full max-w-[300px] object-contain" />
                             )
                         }
                         {
                             file && file["media_type"] === "video" &&
                             (
-                                <video controls src={file["image_url"]} className="w-full h-full" />
+                                <video controls src={file["image_url"]} className="w-full h-full max-w-[300px]" />
                             )
                         }
                     </Card>
+                </div>
 
-                    <div className={" min-w-[400px] text-white bg-transparent shadow-none py-0 flex flex-col gap-5"}>
-                        {/* OVERALL RESULT */}
-                        <Card className={"p-5 text-white bg-white/10 backdrop-blur-lg border-0 "}>
-                            <div className="font-bold text-2xl ">
-                                Agent Review
-                            </div>
-                            <div className="">
-                                {file?.agent_review ?
-                                    "Harmful activity or event detected" :
-                                    "No harmful activity or event detected"
-                                }
-                            </div>
-                        </Card>
+                <Card className={" flex flex-row bg-transparent border-0 shadow-none rounded-lg"}>
 
+                    {
+                        file?.media_type === "image" && (
+                            <>
+                                {/* FACES */}
+                                < Card className={" h-fit w-full p-0 border text-white shadow-none "}>
+                                    <Table className={"text-white h-full py-0 min-w-[400px] rounded-xl overflow-hidden  "}>
+                                        {/* <TableCaption>Faces detected in the video</TableCaption> */}
+                                        <TableHeader className={"  "} >
+                                            <TableRow className={"text-black hover:bg-black/0 border-0"}>
+                                                <TableHead className={"w-[125px] text-black text-center font-light text-lg"}>Faces</TableHead>
+                                                <TableHead className={" text-black text-center font-light text-lg"}>Estimate Age</TableHead>
+                                                <TableHead className={" text-black text-center font-light text-lg"}>AI Detected</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody className={" text-black p-0 "}>
+                                            {
+                                                file?.faces_data?.length > 0 ? (
+                                                    file?.faces_data?.map((val, idx) => {
+                                                        return (
+                                                            <TableRow key={idx} className={"border-0 bg-white hover:bg-muted transition-all"}>
+                                                                {/* FACES */}
+                                                                <TableCell className="align-middle">
+                                                                    <div className="flex flex-col items-center justify-center gap-2">
+                                                                        <div className='h-16 w-16 overflow-hidden rounded-full border'>
+                                                                            <img className='w-full h-full aspect-square object-cover' src={val["face"]} alt={"Person " + (idx + 1)} />
+                                                                        </div>
+                                                                        <div className="text-sm">
+                                                                            Person - {idx + 1}
+                                                                        </div>
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className={"text-center text-lg font-base align-middle"}>{val["estimate_age"]}</TableCell>
+                                                                <TableCell className="align-middle px-5">
+                                                                    <div className="flex items-center justify-center">
+                                                                        {val["ai_prediction"] === true ? (
+                                                                            <div className='w-16 h-16 flex items-center justify-center group rounded-xl bg-radial from-red-400 to-red-500 '>
+                                                                                <Bot animateOnHover className={"size-10 group-hover"} />
+                                                                            </div>
+                                                                        ) : (
+                                                                            <div className='w-16 h-16 flex items-center justify-center group rounded-xl bg-radial from-emerald-400 to-emerald-500 '>
+                                                                                <BotOff animateOnHover className={"size-10"} />
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        )
+                                                    })
+                                                ) : (
+                                                    <TableRow className={" bg-white hover:bg-muted transition-color"}>
+                                                        <TableCell colSpan={3} className="h-96 text-xl font-thin text-center">
+                                                            No faces detected
+                                                        </TableCell>
+                                                    </TableRow>
+                                                )}
+                                        </TableBody>
+                                    </Table>
+                                </Card>
+                            </>
+                        )
+                    }
+                    {
+                        file?.media_type === "video" && (
+                            <>
+                                <Result_UI results={file} />
+                            </>
+                        )
+                    }
+                </Card>
+            </div >
+
+            {/* SIDEBAR RIGHT */}
+            <div className=' pt-16 w-full min-w-[25vw] max-w-[30vw] overflow-hidden'>
+
+                <div className='sticky left-0 top-5  text-white flex flex-col items-center justify-between h-[90vh] border-0 px-5 gap-5 '>
+                    <div className={" text-white bg-transparent shadow-none py-0 flex flex-col gap-5 w-full"}>
                         {/* AI DETECTION */}
-                        <Card className={"p-5 text-white bg-white/10 backdrop-blur-lg border-0 "}>
-                            <div className="font-bold text-2xl ">
+                        <Card className={"p-5 w-full text-black border shadow-sm backdrop-blur-lg "}>
+                            <div className=" text-xl ">
                                 AI Detection Result
                             </div>
                             <div className="flex items-center justify-between">
-                                <div className="text">
-                                    {file?.ai_result?.result === "ai" ? "Fully AI generated" : "Not AI generated"}
+                                <div className="text-sm border px-2 py-0.5 rounded-full bg-muted">
+                                    {file?.ai_result?.result == null ? "Pending" : file?.ai_result?.result === "ai" ? "Fully AI generated" : "Not AI generated"}
                                 </div>
                                 <div className=' max-w-[220px]'>
-                                    <div className="font-bold" >
-                                        Accuracy - {(file?.ai_result?.accuracy * 100).toFixed(2)}%
+                                    <div className="font-semibold text-xs" >
+                                        AI SCORE - {file?.ai_result?.accuracy == null ? "X" : (normalize_value(file?.ai_result?.accuracy, 0.7) * 100).toFixed(2)}%
                                     </div>
                                     <div>
                                         <Progress
-                                            value={file?.ai_result ? (file.ai_result?.accuracy * 100) : 0}
+                                            value={file?.ai_result?.accuracy == null ? 0 : normalize_value(file?.ai_result?.accuracy, 0.7) * 100}
                                             className={"w-full border border-white/30 "}
-                                            indicator_className={(((file?.ai_result) ? (file.ai_result?.accuracy * 100) : 0) > 60 ? " bg-linear-90 from-green-600 to-green-400" : file?.ai_result?.accuracy * 100 > 40 ? "bg-linear-90 from-orange-600 to-orange-400" : "bg-linear-90 from-red-600 to-red-400")}
+                                            indicator_className={((file?.ai_result?.accuracy == null ? "bg-red-400" : (normalize_value(file?.ai_result?.accuracy, 0.7) * 100)) > 60 ? " bg-red-400" : (normalize_value(file?.ai_result?.accuracy, 0.7) * 100) > 40 ? "bg-orange-400" : "bg-emerald-400")}
                                         />
                                     </div>
                                 </div>
@@ -173,143 +276,94 @@ const page = () => {
                         </Card>
 
                         {/* LABELS */}
-                        <Card className={"p-5 text-white bg-white/10 backdrop-blur-lg border-0 h-full"}>
-                            <div className="font-bold text-2xl ">
-                                Labels
+                        <Card className={"p-5 text-black border shadow-sm backdrop-blur-lg"}>
+                            <div className=" text-xl ">
+                                Policy Violations
                             </div>
                             <div className=" flex flex-col justify-evenly gap-5 h-full ">
-                                <div className="flex flex-col items-start gap-2">
-                                    <div>Suspicious </div>
-                                    <div className=" flex w-full flex-wrap gap-1">
-                                        {
-                                            file?.suspicious_labels?.map((val, idx) => (
-                                                <div
-                                                    key={idx}
-                                                    className=" bg-radial-[at_50%_75%] from-red-500 to-red-800 text-white font-bold px-2 py-1 w-fit rounded-full "
-                                                >
-                                                    {val}
-                                                </div>
-                                            ))
-                                        }
-                                    </div>
+                                {/* <div className="flex flex-col items-start gap-2"> */}
+                                {/* <div>Suspicious </div> */}
+                                <div className=" flex w-full flex-wrap gap-1">
+                                    {
+                                        file?.suspicious_labels?.map((val, idx) => (
+                                            <div
+                                                key={idx}
+                                                className=" bg-red-500 text-white font-semibold px-2 py-1 w-fit rounded-full "
+                                            >
+                                                {val}
+                                            </div>
+                                        ))
+                                    }
                                 </div>
-                                <div className="flex flex-col items-start gap-2">
+                                {/* </div> */}
+                                {/* <div className="flex flex-col items-start gap-2">
                                     <div>Events and Actions </div>
                                     <div className=" flex w-full flex-wrap gap-1">
                                         {
                                             file?.action_labels?.map((val, idx) => (
                                                 <div
                                                     key={idx}
-                                                    className="bg-radial-[at_50%_75%] from-blue-500 to-blue-800 text-white font-bold px-2 py-1 w-fit rounded-full "
+                                                    className="bg-blue-500 text-white font-bold px-2 py-1 w-fit rounded-full "
                                                 >
                                                     {val}
                                                 </div>
                                             ))
                                         }
                                     </div>
-                                </div>
+                                </div> */}
                             </div>
                         </Card>
                     </div>
-                </div>
 
-                <Card className={" flex flex-row bg-transparent border-0"}>
-                    {/* FACES */}
-                    {/* <Card className={" min-w-[400px] bg-white/10 text-white border "}> */}
-                    <Table className={"text-white h-full py-0 min-w-[400px] bg-white/10 rounded-lg  "}>
-                        {/* <TableCaption>Faces detected in the video</TableCaption> */}
-                        <TableHeader className={""} >
-                            <TableRow className={"text-white hover:bg-black/0 border-0"}>
-                                <TableHead className={"w-[125px] text-white text-center text-lg"}>Faces</TableHead>
-                                <TableHead className={" text-white text-center text-lg"}>Estimate Age</TableHead>
-                                <TableHead className={" text-white text-center text-lg"}>AI Detected</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody className={"border-0"}>
-                            {
-                                file?.faces_data?.length > 0 ? (
-                                    file?.faces_data?.map((val, idx) => {
-                                        return (
-                                            <TableRow key={idx} className={"border-0 hover:bg-black/20"}>
-                                                {/* FACES */}
-                                                <TableCell className="align-middle">
-                                                    <div className="flex flex-col items-center justify-center gap-2">
-                                                        <div className='h-20 w-20 overflow-hidden rounded-full border border-white/20'>
-                                                            <img className='w-full h-full aspect-square object-cover' src={val["face"]} alt={"Person " + (idx + 1)} />
-                                                        </div>
-                                                        <div className="text-sm">
-                                                            Person - {idx + 1}
-                                                        </div>
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell className={"text-center text-lg font-base align-middle"}>{val["estimate_age"]}</TableCell>
-                                                <TableCell className="align-middle px-5">
-                                                    <div className="flex items-center justify-center">
-                                                        {val["ai_prediction"] === true ? (
-                                                            <div className='w-16 h-16 flex items-center justify-center group rounded-xl bg-radial from-red-400 to-red-500 '>
-                                                                <Bot animateOnHover className={"size-10 group-hover"} />
-                                                            </div>
-                                                        ) : (
-                                                            <div className='w-16 h-16 flex items-center justify-center group rounded-xl bg-radial from-green-400 to-green-500 '>
-                                                                <BotOff animateOnHover className={"size-10"} />
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </TableCell>
-                                            </TableRow>
-                                        )
-                                    })
-                                ) : (
-                                    <TableRow className={" hover:bg-black/20"}>
-                                        <TableCell colSpan={3} className="h-96 text-xl font-thin text-center">
-                                            No faces detected
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                        </TableBody>
-                    </Table>
+                    <Card className={" flex flex-col justify-between p-0 shadow-none w-full border-0 text-white h-full min-h-[300px] bg-transparent "}>
 
-                    {/* </Card> */}
-                    <Card className={" shadow-none w-full border-0 text-white flex flex-col items-end h-fit min-h-[300px] bg-transparent "}>
 
-                        <div className='text-2xl font-bold w-full'>
+                        {/* <div className='text-2xl font-bold w-full text-black'>
                             Assess Review
-                        </div>
-                        <div className='w-full'>
-                            <ManagementBar mark_for_review={mark_for_review} go_to_file={go_to_file} total_pages={CaseFiles.length} className={"w-full"} />
-                        </div>
-                        <form onSubmit={submit_comment_review} className='w-full bg-white/10 p-5 rounded-xl'>
-                            <div className='text-xl'>
+                        </div> */}
+                        <form onSubmit={submit_comment_review} className='w-full bg-white  rounded-xl'>
+                            <div className='text-xl font-light  text-black'>
                                 Comment
                             </div>
 
-                            <div className='py-2'>
-                                <textarea value={file?.review_comment} onChange={(e) => setFile({ ...file, review_comment: e.target.value })} name="comment" rows={6} className='w-full border-[0.1px] border-white/20 rounded-lg focus:inset-0 focus:outline-0 p-3 ' />
+                            <div className='py-2  '>
+                                <textarea
+                                    value={file?.review_comment ? file?.review_comment : ""}
+                                    onChange={(e) => setFile({ ...file, review_comment: e.target.value })}
+                                    name="comment"
+                                    rows={3}
+                                    placeholder='Enter your comment'
+                                    className='w-full text-black border outline-0 focus:outline-2 focus:outline-blue-700/20 focus:bg-white/5 rounded-lg focus:inset-0 p-3 transition-all '
+                                />
                             </div>
 
                             <div className="w-full flex justify-end">
                                 <motion.button
                                     whileTap={{ scale: 0.975 }}
-                                    className=" text-lg cursor-pointer flex h-10 w-fit items-center rounded-lg bg-neutral-200 px-2.5 py-2 text-neutral-600 "
+                                    className=" text-lg cursor-pointer flex h-10 w-fit items-center rounded-lg bg-blue-700 px-2.5 py-2 text-white "
                                 >
                                     Save
                                 </motion.button>
                             </div>
                         </form>
+
+                        <div className='w-full '>
+                            <ManagementBar mark_for_review={mark_for_review} go_to_file={go_to_file} total_pages={CaseFiles.length} className={"w-full"} />
+                        </div>
                         {/*                         
                         <div className='flex flex-row gap-5 '>
                             <div className=' font-bold h-fit border border-red-700 bg-red-400 hover:bg-red-500 p-3 rounded-xl w-fit transition-all cursor-pointer '>
                                 Flag for investigation
                             </div>
-                            <div className=' font-bold h-fit border border-green-800 bg-green-500 hover:bg-green-600 p-3 rounded-xl w-fit transition-all cursor-pointer '>
+                            <div className=' font-bold h-fit border border-emerald-800 bg-emerald-500 hover:bg-emerald-600 p-3 rounded-xl w-fit transition-all cursor-pointer '>
                                 All good
                             </div>
                         </div> */}
-                    </Card>
 
-                </Card>
-            </div >
-        </div>
+                    </Card>
+                </div>
+            </div>
+        </div >
 
     )
 }

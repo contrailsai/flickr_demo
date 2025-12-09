@@ -6,7 +6,11 @@ if (!process.env.MONGODB_URI) {
 }
 
 const uri = process.env.MONGODB_URI;
-const options = {};
+const options = {
+    retryWrites: true,
+    w: 'majority',
+    serverSelectionTimeoutMS: 5000,
+};
 
 let client;
 let clientPromise;

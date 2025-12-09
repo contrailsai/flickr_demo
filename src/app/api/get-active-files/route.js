@@ -5,7 +5,7 @@ export async function GET() {
     try {
         const client = await clientPromise;
         const db = client.db("deepfake-detection");
-
+        console.log("connected to db ");
         const data = await db.collection("flickr_results").find({
             active: true
         });

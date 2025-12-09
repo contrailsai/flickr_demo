@@ -62,56 +62,56 @@ function ManagementBar({ mark_for_review, go_to_file, total_pages }) {
   return (
     <div className="@container/wrapper w-full flex justify-end ">
       <div
-        className="flex w-full flex-row items-center gap-y-2 rounded-xl bg-white/10 backdrop-blur-2xl p-2 shadow-lg">
+        className="flex w-full flex-row items-center gap-y-2 rounded-xl backdrop-blur-2xl p-0 pb-3">
 
         <div
-          className="mx-auto flex flex-row shrink-0 items-center justify-between w-full"
+          className="mx-auto flex flex-row flex-wrap gap-5 shrink-0 items-center justify-between w-full"
         >
           <div className="flex h-10">
             <button
               disabled={currentPage === 1}
-              className="p-1 text-white hover:text-white/70 cursor-pointer transition-colors disabled:text-white/20 disabled:hover:text-white/10"
+              className="p-1 text-black hover:text-black/70 cursor-pointer transition-colors disabled:text-black/20 disabled:hover:text-black/10"
               onClick={handlePrevPage}>
               <ChevronLeft size={20} />
             </button>
             <div className=" flex items-center space-x-1 text-sm tabular-nums">
-              <SlidingNumber className="text-white pl-2 " padStart number={currentPage} />
-              <span className="text-white/40 min-w-8">/ {TOTAL_PAGES}</span>
+              <SlidingNumber className="text-black pl-2 " padStart number={currentPage} />
+              <span className="text-black/40 min-w-8">/ {TOTAL_PAGES}</span>
             </div>
             <button
               disabled={currentPage === TOTAL_PAGES}
-              className="p-1 text-white hover:text-white/70 cursor-pointer transition-colors disabled:text-white/20 disabled:hover:text-white/10"
+              className="p-1 text-black hover:text-black/70 cursor-pointer transition-colors disabled:text-black/20 disabled:hover:text-black/10"
               onClick={handleNextPage}>
               <ChevronRight size={20} />
             </button>
           </div>
 
-          <div className="mx-3 h-6 w-px bg-border rounded-full " />
+          {/* Mark for review */}
+          <motion.button
+            whileTap={{ scale: 0.975 }}
+            onClick={mark_for_review}
+            // {...BUTTON_MOTION_CONFIG}
+            className=" cursor-pointer flex h-10 w-42 items-center space-x-2 whitespace-nowrap rounded-lg bg-neutral-200 dark:bg-neutral-600/80 px-2.5 py-2 text-neutral-600 dark:text-neutral-200"
+            aria-label="mark_review">
+            <Pin size={20} animateOnHover className="shrink-0" />
+            <div
+              variants={LABEL_VARIANTS}
+              transition={LABEL_TRANSITION}
+              className=" text-sm w-full">
+              Mark for later
+            </div>
+          </motion.button>
 
           <motion.div
             // layout
             // layoutRoot
-            className="mx-auto flex flex-wrap justify-end gap-3 sm:flex-nowrap w-full"
+            className="mx-auto flex flex-wrap justify-between gap-3 sm:flex-nowrap w-full"
           >
-            <motion.button
-              whileTap={{ scale: 0.975 }}
-              onClick={mark_for_review}
-              // {...BUTTON_MOTION_CONFIG}
-              className=" cursor-pointer flex h-10 w-fit items-center space-x-2 whitespace-nowrap rounded-lg bg-neutral-200 dark:bg-neutral-600/80 px-2.5 py-2 text-neutral-600 dark:text-neutral-200"
-              aria-label="mark_review">
-              <Pin size={20} animateOnHover className="shrink-0" />
-              <div
-                variants={LABEL_VARIANTS}
-                transition={LABEL_TRANSITION}
-                className=" text-sm w-full">
-                Mark for later
-              </div>
-            </motion.button>
 
             <motion.button
               whileTap={{ scale: 0.975 }}
               // {...BUTTON_MOTION_CONFIG}
-              className=" cursor-pointer flex h-10 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-lg bg-radial-[at_50%_75%] from-red-500 to-red-800 text-white dark:bg-red-800/80 px-2.5 py-2 dark:text-red-300"
+              className=" cursor-pointer flex h-10 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-lg bg-red-500 text-white px-2.5 py-2"
               aria-label="Reject">
               <BellRing animateOnHover size={20} strokeWidth={2.5} className="shrink-0" />
               <motion.span
@@ -125,9 +125,9 @@ function ManagementBar({ mark_for_review, go_to_file, total_pages }) {
             <motion.button
               whileTap={{ scale: 0.975 }}
               // {...BUTTON_MOTION_CONFIG}
-              className=" cursor-pointer flex h-10 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-lg bg-radial-[at_50%_75%] from-green-500 to-green-800 text-white px-2.5 py-2 dark:text-green-300"
+              className=" cursor-pointer flex h-10 items-center space-x-2 overflow-hidden whitespace-nowrap rounded-lg bg-emerald-500 text-white px-2.5 py-2"
               aria-label="Hire">
-              <BadgeCheck animateOnHover size={20} strokeWidth={2.5} className="shrink-0" />
+              <BadgeCheck animateOnHover size={24} strokeWidth={2.5} className="shrink-0" />
               <motion.span
                 variants={LABEL_VARIANTS}
                 transition={LABEL_TRANSITION}
