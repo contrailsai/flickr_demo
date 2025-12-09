@@ -1,8 +1,6 @@
 "use client";
 import LineChart from "./LineChart";
-import { useRef, useState, useEffect } from "react";
-// import { VideoPlayer } from "./VideoPlayer";
-import Waveform from "./Waveform";
+import { useRef, useState } from "react";
 import { UserCircle, ChevronRight } from "lucide-react";
 import Image from "next/image";
 
