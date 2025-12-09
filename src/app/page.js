@@ -100,11 +100,13 @@ const page = () => {
                 },
                 body: JSON.stringify({
                     image_url: file?.image_url,
-                    comment: file?.review_comment,
+                    comment: [...file?.review_comment, e.target.comment.value],
                 }),
             })
             const data = await response.json();
             console.log(data);
+            setFile({ ...file, review_comment: [...file?.review_comment, e.target.comment.value] });
+            e.target.comment.value = "";
         }
         catch (error) {
             console.log(error);
@@ -323,24 +325,39 @@ const page = () => {
                         </div> */}
                         <form onSubmit={submit_comment_review} className='w-full bg-white  rounded-xl'>
                             <div className='text-xl font-light  text-black'>
-                                Comment
+                                Comments
                             </div>
+                            {
+                                file?.review_comment && (
+                                    <div className=' p-5 gap-2 border rounded-r-2xl rounded-b-2xl text-black flex flex-col justify-top items-end bg-muted/50 overflow-auto max-h-[220px] min-h-[150px]'>
+                                        {
+                                            file.review_comment.length > 0 ?
+                                                file.review_comment.map((v, i) => (
+                                                    <div className=' text-lg font-light border text-right w-fit px-5 py-0.5 rounded-l-2xl rounded-t-2xl bg-white ' key={i}>
+                                                        {v}
+                                                    </div>
+                                                ))
+                                                :
+                                                <div className=' text-xl w-full h-full flex items-center justify-center font-light text-right px-5 py-0.5 '>
+                                                    No Comments Available
+                                                </div>
+                                        }
+                                    </div>
+                                )
+                            }
 
-                            <div className='py-2  '>
+                            <div className='py-2 flex gap-2  '>
                                 <textarea
-                                    value={file?.review_comment ? file?.review_comment : ""}
-                                    onChange={(e) => setFile({ ...file, review_comment: e.target.value })}
+                                    // value={file?.review_comment ? file?.review_comment : ""}
+                                    // onChange={(e) => setFile({ ...file, review_comment: e.target.value })}
                                     name="comment"
-                                    rows={3}
+                                    rows={1}
                                     placeholder='Enter your comment'
-                                    className='w-full text-black border outline-0 focus:outline-2 focus:outline-blue-700/20 focus:bg-white/5 rounded-lg focus:inset-0 p-3 transition-all '
+                                    className=' min-h-12 w-full text-black border outline-0 focus:outline-2 focus:outline-blue-700/20 focus:bg-white/5 rounded-lg focus:inset-0 p-3 transition-all '
                                 />
-                            </div>
-
-                            <div className="w-full flex justify-end">
                                 <motion.button
                                     whileTap={{ scale: 0.975 }}
-                                    className=" text-lg cursor-pointer flex h-10 w-fit items-center rounded-lg bg-blue-700 px-2.5 py-2 text-white "
+                                    className=" text-lg cursor-pointer flex w-fit items-center rounded-lg bg-blue-700 px-2.5 py-2 text-white "
                                 >
                                     Save
                                 </motion.button>
