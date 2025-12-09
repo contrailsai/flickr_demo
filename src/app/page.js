@@ -23,10 +23,12 @@ import Result_UI from '@/app/review/Video_UI'
 const page = () => {
     const [file, setFile] = useState(null);
     const [CaseFiles, setCaseFiles] = useState([]);
+    const [loading, Setloading] = useState(false);
 
     useEffect(() => {
         const fetch_active_files = async () => {
             let tries = 0;
+            Setloading(true);
             while (tries < 5) {
                 try {
                     const response = await fetch("/api/get-active-files", {
@@ -50,6 +52,7 @@ const page = () => {
                     console.log(tries, error);
                 }
             }
+            Setloading(false);
         }
 
         if (!CaseFiles.length) {
@@ -145,7 +148,7 @@ const page = () => {
             </div>
 
             {/* sidebar */}
-            <SidebarLeft CaseFiles={CaseFiles} setCaseFiles={setCaseFiles} setFile={setFile} />
+            <SidebarLeft loading={loading} CaseFiles={CaseFiles} setCaseFiles={setCaseFiles} setFile={setFile} />
 
             {/* case review */}
             <div className=" mt-14 max-h-[90vh] overflow-auto w-full p-5 bg-linear-90 to-white from-white text-white ">
@@ -329,11 +332,11 @@ const page = () => {
                             </div>
                             {
                                 file?.review_comment && (
-                                    <div className=' p-5 gap-2 border rounded-r-2xl rounded-b-2xl text-black flex flex-col justify-top items-end bg-muted/50 overflow-auto max-h-[220px] min-h-[150px]'>
+                                    <div className=' p-5 gap-2 border rounded-r-xl rounded-b-xl text-black flex flex-col justify-top items-end bg-muted/50 overflow-auto max-h-[220px] min-h-[150px]'>
                                         {
                                             file.review_comment.length > 0 ?
                                                 file.review_comment.map((v, i) => (
-                                                    <div className=' text-lg font-light border text-right w-fit px-5 py-0.5 rounded-l-2xl rounded-t-2xl bg-white ' key={i}>
+                                                    <div className=' text-lg font-light border text-right w-fit px-5 py-0.5 rounded-l-xl rounded-t-xl bg-white ' key={i}>
                                                         {v}
                                                     </div>
                                                 ))
@@ -353,11 +356,11 @@ const page = () => {
                                     name="comment"
                                     rows={1}
                                     placeholder='Enter your comment'
-                                    className=' min-h-12 w-full text-black border outline-0 focus:outline-2 focus:outline-blue-700/20 focus:bg-white/5 rounded-lg focus:inset-0 p-3 transition-all '
+                                    className=' min-h-12 w-full text-black border outline-0 focus:outline-2 focus:outline-blue-700/20 focus:bg-white/5 rounded-xl focus:inset-0 p-3 transition-all '
                                 />
                                 <motion.button
                                     whileTap={{ scale: 0.975 }}
-                                    className=" text-lg cursor-pointer flex w-fit items-center rounded-lg bg-blue-700 px-2.5 py-2 text-white "
+                                    className=" text-lg cursor-pointer flex w-fit items-center rounded-xl bg-blue-700 px-2.5 py-2 text-white "
                                 >
                                     Save
                                 </motion.button>

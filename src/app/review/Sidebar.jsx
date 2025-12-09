@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { CirclePlus } from "@/components/animate-ui/icons/circle-plus"
+import { Loader2 } from "lucide-react"
 import { Pin } from '@/components/animate-ui/icons/pin';
 import { SendHorizontal } from '@/components/animate-ui/icons/send-horizontal';
 import {
@@ -15,9 +16,7 @@ import {
 } from "@/components/ui/table"
 import { motion } from 'motion/react';
 
-const SidebarLeft = ({ CaseFiles, setCaseFiles, setFile }) => {
-
-    const [open_add, setOpenAdd] = useState(false);
+const SidebarLeft = ({ loading, CaseFiles, setCaseFiles, setFile }) => {
 
     const Url_Submit = async (e) => {
         e.preventDefault();
@@ -56,7 +55,6 @@ const SidebarLeft = ({ CaseFiles, setCaseFiles, setFile }) => {
         }
 
         setCaseFiles((prev) => [...prev, strucutre]);
-        setOpenAdd(false);
         e.target.url.value = "";
     }
 
@@ -83,7 +81,11 @@ const SidebarLeft = ({ CaseFiles, setCaseFiles, setFile }) => {
 
                     <div className='w-full h-[63vh] overflow-auto  flex flex-col gap-5 items-center'>
                         {
-                            CaseFiles.length > 0 ? (
+                            loading ? (
+                                <div className='w-full h-full flex items-center justify-center'>
+                                    <Loader2 className="h-8 w-8 animate-spin" stroke="black" />
+                                </div>
+                            ) : CaseFiles.length > 0 ? (
                                 CaseFiles.map((filedata, index) => (
                                     <div key={index}
                                         className={" text-black border backdrop-blur-md p-3 rounded-lg w-full min-h-24 cursor-pointer transition-colors "}
