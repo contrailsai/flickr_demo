@@ -214,13 +214,19 @@ const page = () => {
                                                                 <TableCell className={"text-center text-lg font-base align-middle"}>{val["estimate_age"]}</TableCell>
                                                                 <TableCell className="align-middle px-5">
                                                                     <div className="flex items-center justify-center">
-                                                                        {val["ai_prediction"] === true ? (
-                                                                            <div className='w-16 h-16 flex items-center justify-center group rounded-xl bg-radial from-red-400 to-red-500 '>
-                                                                                <Bot animateOnHover className={"size-10 group-hover"} />
+                                                                        {val["ai_prediction"] <= 50 ? (
+                                                                            <div className=' flex flex-row items-center justify-center gap-4 p-2 text-white h-10 font-bold group rounded-xl bg-radial from-rose-400 to-red-500 '>
+                                                                                {val["ai_prediction"]} %
+                                                                                <BotOff animateOnHover className={"size-7"} />
                                                                             </div>
+                                                                            // <div className='w-16 h-16 font-bold flex items-center justify-center group rounded-xl bg-radial from-red-400 to-red-500 '>
+                                                                            //     {val["ai_prediction"]} %
+                                                                            //     {/* <Bot animateOnHover className={"size-10 group-hover"} /> */}
+                                                                            // </div>
                                                                         ) : (
-                                                                            <div className='w-16 h-16 flex items-center justify-center group rounded-xl bg-radial from-emerald-400 to-emerald-500 '>
-                                                                                <BotOff animateOnHover className={"size-10"} />
+                                                                            <div className=' flex flex-row items-center justify-center gap-4 p-2 text-white h-10 font-bold group rounded-xl bg-radial from-emerald-400 to-green-500 '>
+                                                                                {val["ai_prediction"]} %
+                                                                                <BotOff animateOnHover className={"size-7"} />
                                                                             </div>
                                                                         )}
                                                                     </div>
@@ -273,7 +279,7 @@ const page = () => {
                                         <Progress
                                             value={file?.ai_result?.accuracy == null ? 0 : normalize_value(file?.ai_result?.accuracy, 0.7) * 100}
                                             className={"w-full border border-white/30 "}
-                                            indicator_className={((file?.ai_result?.accuracy == null ? "bg-red-400" : (normalize_value(file?.ai_result?.accuracy, 0.7) * 100)) > 60 ? " bg-red-400" : (normalize_value(file?.ai_result?.accuracy, 0.7) * 100) > 40 ? "bg-orange-400" : "bg-emerald-400")}
+                                            indicator_className={((file?.ai_result?.accuracy == null ? "bg-red-400" : (normalize_value(file?.ai_result?.accuracy, 0.7) * 100)) > 60 ? " bg-emerald-400" : (normalize_value(file?.ai_result?.accuracy, 0.7) * 100) > 40 ? "bg-orange-400" : "bg-red-400")}
                                         />
                                     </div>
                                 </div>
@@ -290,14 +296,22 @@ const page = () => {
                                 {/* <div>Suspicious </div> */}
                                 <div className=" flex w-full flex-wrap gap-1">
                                     {
-                                        file?.suspicious_labels?.map((val, idx) => (
-                                            <div
-                                                key={idx}
-                                                className=" bg-red-500 text-white font-semibold px-2 py-1 w-fit rounded-full "
-                                            >
-                                                {val}
+                                        file?.suspicious_labels?.length > 0 ?
+
+                                            file?.suspicious_labels?.map((val, idx) => (
+                                                <div
+                                                    key={idx}
+                                                    className=" bg-red-500 text-white font-semibold px-2 py-1 w-fit rounded-full "
+                                                >
+                                                    {val}
+                                                </div>
+                                            ))
+                                            :
+                                            <div className=" flex w-full items-center justify-center flex-wrap gap-1">
+                                                <div className=" text-black/50 font-light text-xl px-2 py-1 w-fit rounded-full ">
+                                                    No Suspicious Labels Found
+                                                </div>
                                             </div>
-                                        ))
                                     }
                                 </div>
                                 {/* </div> */}

@@ -1,19 +1,20 @@
 "use Client";
 
-import { useEffect, useState } from 'react';
-import { CirclePlus } from "@/components/animate-ui/icons/circle-plus"
+// import { useEffect, useState } from 'react';
+// import { CirclePlus } from "@/components/animate-ui/icons/circle-plus"
 import { Loader2 } from "lucide-react"
 import { Pin } from '@/components/animate-ui/icons/pin';
 import { SendHorizontal } from '@/components/animate-ui/icons/send-horizontal';
-import {
-    Table,
-    TableBody,
-    TableCaption,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
+import { Clapperboard, Image } from "lucide-react"
+// import {
+//     Table,
+//     TableBody,
+//     TableCaption,
+//     TableCell,
+//     TableHead,
+//     TableHeader,
+//     TableRow,
+// } from "@/components/ui/table"
 import { motion } from 'motion/react';
 
 const SidebarLeft = ({ loading, CaseFiles, setCaseFiles, setFile }) => {
@@ -105,14 +106,27 @@ const SidebarLeft = ({ loading, CaseFiles, setCaseFiles, setFile }) => {
                                                             <Pin fill="white" size={20} />
                                                         </span>
                                                     }
-                                                    <span className='text-sm bg-amber-500 font-bold text-white px-2 py-0.5 h-fit rounded-3xl '>
-                                                        {filedata.ai_result.result === null ? "Pending" : filedata?.ai_result?.result.toUpperCase()}
+                                                    <span className='text-sm bg-blue-700 font-bold text-white px-2 py-0.5 h-fit rounded-3xl '>
+                                                        {filedata.ai_result.result === null ? "Pending" : filedata?.ai_result?.result}
                                                     </span>
                                                     <span className='text-sm  px-3 py-0.5 rounded-3xl '>
-                                                        {filedata.agent_review === null ? "Pending" : filedata?.agent_review === "bad" ? "Bad" : "Good"}
+                                                        {filedata.agent_review === null ? "Pending" : filedata?.agent_review === "bad" ? "Policy Violation" : "Good"}
                                                     </span>
                                                     <span className='text-sm  px-3 py-0.5 rounded-3xl '>
-                                                        {filedata?.media_type === "image" ? "Image" : "Video"}
+                                                        {filedata?.media_type === "image" ?
+                                                            (
+                                                                <span className="flex items-center gap-1">
+                                                                    <Image size={20} strokeWidth={1.5} />
+                                                                    Image
+                                                                </span>
+                                                            ) :
+                                                            (
+                                                                <span className="flex items-center gap-1">
+                                                                    <Clapperboard size={20} strokeWidth={1.5} />
+                                                                    Video
+                                                                </span>
+                                                            )
+                                                        }
                                                     </span>
                                                 </div>
                                             </div>

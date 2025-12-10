@@ -26,11 +26,19 @@ function LineChart({ chartData }) {
 
         scales: {
             x: {
-                position: 'top'
+                position: 'top',
+                grid: {
+                    display: false,
+                    drawBorder: false // Optional: also removes the axis line itself
+                }
             },
             y: {
                 min: 0,
-                max: 1
+                max: 1,
+                grid: {
+                    display: false,
+                    drawBorder: false // Optional: also removes the axis line itself
+                }
             }
         },
         plugins: {

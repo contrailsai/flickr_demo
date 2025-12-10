@@ -164,7 +164,7 @@ export default function Result_UI({ results }) {
             <div className=" flex flex-col relative">
 
                 {/* FRAME CHECK */}
-                <div className={` opacity-100 z-20 max-w-[50vw] overflow-hidden duration-300 transition-all`}>
+                <div className={` opacity-100 z-20 max-w-[42.5vw] overflow-hidden duration-300 transition-all`}>
                     <div ref={frame_graph_Ref} className={` h-full flex flex-col gap-2 py-5 rounded-3xl overflow-hidden`}>
                         {
                             Object.keys(results["faces_data"])
@@ -180,7 +180,7 @@ export default function Result_UI({ results }) {
                                         return null;
                                     }
                                     return (
-                                        <div key={idx} className=" flex flex-col">
+                                        <div key={idx} className=" flex flex-col w-[42.5vw]">
                                             <div
                                                 className={` group rounded-3xl bg-blue-700 border-8 border-blue-700 flex ${toggle_open === idx ? "h-72" : " "} transition-all overflow-hidden `}
                                                 key={idx}
@@ -270,7 +270,7 @@ export default function Result_UI({ results }) {
                                                     </div>
 
                                                     {/* PERSON's GRAPH */}
-                                                    <div className={` ${toggle_open === idx ? 'max-h-72' : 'max-h-0'} h-full w-full bg-white rounded-2xl px-2 overflow-hidden transition-all `}>
+                                                    <div className={` ${toggle_open === idx ? 'max-h-72' : 'max-h-0'} h-full w-full rounded-2xl px-2 overflow-hidden transition-all `}>
                                                         {frame_charts &&
                                                             idx < 3 ?
                                                             (
