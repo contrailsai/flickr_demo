@@ -166,13 +166,13 @@ const page = () => {
                         {
                             file && file["media_type"] === "image" &&
                             (
-                                <img src={file["image_url"]} className="w-full h-full max-w-[300px] object-contain" />
+                                <img src={file["image_url"]} className="w-full h-full max-h-[500px] object-contain" />
                             )
                         }
                         {
                             file && file["media_type"] === "video" &&
                             (
-                                <video controls src={file["image_url"]} className="w-full h-full max-w-[300px]" />
+                                <video controls src={file["image_url"]} className="w-full max-h-[500px] h-full" />
                             )
                         }
                     </Card>
@@ -216,7 +216,7 @@ const page = () => {
                                                                     <div className="flex items-center justify-center">
                                                                         {val["ai_prediction"] <= 50 ? (
                                                                             <div className=' flex flex-row items-center justify-center gap-4 p-2 text-white h-10 font-bold group rounded-xl bg-radial from-rose-400 to-red-500 '>
-                                                                                {val["ai_prediction"]} %
+                                                                                {(100 - val["ai_prediction"]).toFixed(2)} %
                                                                                 <BotOff animateOnHover className={"size-7"} />
                                                                             </div>
                                                                             // <div className='w-16 h-16 font-bold flex items-center justify-center group rounded-xl bg-radial from-red-400 to-red-500 '>
@@ -225,7 +225,7 @@ const page = () => {
                                                                             // </div>
                                                                         ) : (
                                                                             <div className=' flex flex-row items-center justify-center gap-4 p-2 text-white h-10 font-bold group rounded-xl bg-radial from-emerald-400 to-green-500 '>
-                                                                                {val["ai_prediction"]} %
+                                                                                {(100 - val["ai_prediction"]).toFixed(2)} %
                                                                                 <BotOff animateOnHover className={"size-7"} />
                                                                             </div>
                                                                         )}
@@ -269,17 +269,21 @@ const page = () => {
                             </div>
                             <div className="flex items-center justify-between">
                                 <div className="text-sm border px-2 py-0.5 rounded-full bg-muted">
-                                    {file?.ai_result?.result == null ? "Pending" : file?.ai_result?.result === "ai" ? "Fully AI generated" : "Not AI generated"}
+                                    {file?.ai_result?.result == null ? "Pending" : file?.ai_result?.result.toLowerCase() === "ai" ? "Fully AI generated" : "Not AI generated"}
                                 </div>
                                 <div className=' max-w-[220px]'>
                                     <div className="font-semibold text-xs" >
-                                        AI SCORE - {file?.ai_result?.accuracy == null ? "X" : (normalize_value(file?.ai_result?.accuracy, 0.7) * 100).toFixed(2)}%
+                                        AI SCORE - {file?.ai_result?.accuracy == null ? "X" : ((1 - normalize_value(file?.ai_result?.accuracy, 0.7)) * 100).toFixed(2)}%
                                     </div>
                                     <div>
                                         <Progress
-                                            value={file?.ai_result?.accuracy == null ? 0 : normalize_value(file?.ai_result?.accuracy, 0.7) * 100}
+                                            value={file?.ai_result?.accuracy == null ? 0 : ((1 - normalize_value(file?.ai_result?.accuracy, 0.7)) * 100)}
                                             className={"w-full border border-white/30 "}
-                                            indicator_className={((file?.ai_result?.accuracy == null ? "bg-red-400" : (normalize_value(file?.ai_result?.accuracy, 0.7) * 100)) > 60 ? " bg-emerald-400" : (normalize_value(file?.ai_result?.accuracy, 0.7) * 100) > 40 ? "bg-orange-400" : "bg-red-400")}
+                                            indicator_className={(
+                                                file?.ai_result?.accuracy == null ? "bg-red-400" :
+                                                    ((1 - normalize_value(file?.ai_result?.accuracy, 0.7)) * 100) > 60 ? " bg-red-400" :
+                                                        ((1 - normalize_value(file?.ai_result?.accuracy, 0.7)) * 100) > 40 ? "bg-orange-400" : "bg-emerald-400"
+                                            )}
                                         />
                                     </div>
                                 </div>
