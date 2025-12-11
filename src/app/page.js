@@ -270,9 +270,9 @@ const page = () => {
                                                                 <TableCell className={"text-center text-lg font-base align-middle"}>{val["estimate_age"]}</TableCell>
                                                                 <TableCell className="align-middle px-5">
                                                                     <div className="flex items-center justify-center">
-                                                                        {val["ai_prediction"] <= 50 ? (
+                                                                        {(val["ai_prediction"] * 100) >= 50 ? (
                                                                             <div className=' flex flex-row items-center justify-center gap-4 p-2 text-white h-10 font-bold group rounded-xl bg-radial from-rose-400 to-red-500 '>
-                                                                                {(100 - val["ai_prediction"]).toFixed(2)} %
+                                                                                {(val["ai_prediction"] * 100).toFixed(2)} %
                                                                                 <Bot animateOnHover className={"size-7"} />
                                                                             </div>
                                                                             // <div className='w-16 h-16 font-bold flex items-center justify-center group rounded-xl bg-radial from-red-400 to-red-500 '>
@@ -281,7 +281,7 @@ const page = () => {
                                                                             // </div>
                                                                         ) : (
                                                                             <div className=' flex flex-row items-center justify-center gap-4 p-2 text-white h-10 font-bold group rounded-xl bg-radial from-emerald-400 to-green-500 '>
-                                                                                {(100 - val["ai_prediction"]).toFixed(2)} %
+                                                                                {((val["ai_prediction"] * 100)).toFixed(2)} %
                                                                                 <BotOff animateOnHover className={"size-7"} />
                                                                             </div>
                                                                         )}
