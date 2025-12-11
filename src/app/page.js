@@ -80,7 +80,63 @@ const page = () => {
             console.log(error);
         }
     }
+
+    const block_content = async () => {
+        try {
+            const response = await fetch(`/api/block-content`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    image_url: file?.image_url
+                }),
+            })
+            const data = await response.json();
+            console.log(data);
+            setFile({ ...file, agent_review: "blocked" });
+            setCaseFiles(CaseFiles.map((val, idx) => {
+                if (val.image_url === file.image_url) {
+                    return { ...val, agent_review: "blocked" };
+                }
+                return val;
+            }));
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
+
+    const pass_content = async () => {
+        try {
+            const response = await fetch(`/api/pass-content`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    image_url: file?.image_url
+                }),
+            })
+            const data = await response.json();
+            console.log(data);
+            setFile({ ...file, agent_review: "good" });
+            setCaseFiles(CaseFiles.map((val, idx) => {
+                if (val.image_url === file.image_url) {
+                    return { ...val, agent_review: "good" };
+                }
+                return val;
+            }));
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
+
     const go_to_file = (direction) => {
+        if (file === undefined) {
+            setFile(CaseFiles[0]);
+        }
         if (direction === "next") {
             const index = CaseFiles.findIndex((filedata) => filedata.image_url === file.image_url);
             if (index !== CaseFiles.length - 1) {
@@ -151,7 +207,7 @@ const page = () => {
             <SidebarLeft loading={loading} CaseFiles={CaseFiles} setCaseFiles={setCaseFiles} setFile={setFile} />
 
             {/* case review */}
-            <div className=" mt-14 max-h-[90vh] overflow-auto w-full p-5 bg-linear-90 to-white from-white text-white ">
+            <div className=" mt-14 min-h-[90vh] overflow-auto w-full p-5 bg-linear-90 to-white from-white text-white ">
 
                 <div className="flex gap-5 ">
                     <Card className={" w-full flex items-center justify-center shadow-none min-h-[30vh] overflow-hidden aspect-auto p-0 bg-muted text-black backdrop-blur-xl border "} >
@@ -217,7 +273,7 @@ const page = () => {
                                                                         {val["ai_prediction"] <= 50 ? (
                                                                             <div className=' flex flex-row items-center justify-center gap-4 p-2 text-white h-10 font-bold group rounded-xl bg-radial from-rose-400 to-red-500 '>
                                                                                 {(100 - val["ai_prediction"]).toFixed(2)} %
-                                                                                <BotOff animateOnHover className={"size-7"} />
+                                                                                <Bot animateOnHover className={"size-7"} />
                                                                             </div>
                                                                             // <div className='w-16 h-16 font-bold flex items-center justify-center group rounded-xl bg-radial from-red-400 to-red-500 '>
                                                                             //     {val["ai_prediction"]} %
@@ -258,7 +314,7 @@ const page = () => {
             </div >
 
             {/* SIDEBAR RIGHT */}
-            <div className=' pt-16 w-full min-w-[25vw] max-w-[30vw] overflow-hidden'>
+            <div className=' pt-14.5 w-full min-w-[25vw] max-w-[30vw] overflow-hidden'>
 
                 <div className='sticky left-0 top-5  text-white flex flex-col items-center justify-between h-[90vh] border-0 px-5 gap-5 '>
                     <div className={" text-white bg-transparent shadow-none py-0 flex flex-col gap-5 w-full"}>
@@ -273,7 +329,7 @@ const page = () => {
                                 </div>
                                 <div className=' max-w-[220px]'>
                                     <div className="font-semibold text-xs" >
-                                        AI SCORE - {file?.ai_result?.accuracy == null ? "X" : ((1 - normalize_value(file?.ai_result?.accuracy, 0.7)) * 100).toFixed(2)}%
+                                        AIGC SCORE - {file?.ai_result?.accuracy == null ? "X" : ((1 - normalize_value(file?.ai_result?.accuracy, 0.7)) * 100).toFixed(2)}%
                                     </div>
                                     <div>
                                         <Progress
@@ -344,7 +400,7 @@ const page = () => {
                         {/* <div className='text-2xl font-bold w-full text-black'>
                             Assess Review
                         </div> */}
-                        <form onSubmit={submit_comment_review} className='w-full bg-white  rounded-xl'>
+                        <form onSubmit={submit_comment_review} className='w-full bg-white   rounded-xl'>
                             <div className='text-xl font-light  text-black'>
                                 Comments
                             </div>
@@ -385,8 +441,8 @@ const page = () => {
                             </div>
                         </form>
 
-                        <div className='w-full '>
-                            <ManagementBar mark_for_review={mark_for_review} go_to_file={go_to_file} total_pages={CaseFiles.length} className={"w-full"} />
+                        <div className='w-full  '>
+                            <ManagementBar file={file} pass_content={pass_content} block_content={block_content} mark_for_review={mark_for_review} go_to_file={go_to_file} total_pages={CaseFiles.length} className={"w-full"} />
                         </div>
                         {/*                         
                         <div className='flex flex-row gap-5 '>

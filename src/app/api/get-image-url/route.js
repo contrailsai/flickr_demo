@@ -1,8 +1,34 @@
+import clientPromise from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 
 export async function POST(request) {
     const { image_url } = await request.json();
+    console.log(image_url);
 
+    // Try to get the active file from db
+    try {
+        const client = await clientPromise;
+        const db = client.db("deepfake-detection");
+        console.log("connected to db ");
+        const data = await db.collection("flickr_results").findOneAndUpdate({
+            active: false,
+            url: image_url
+        }, {
+            $set: {
+                active: true
+            }
+        });
+        const result = await data.value;
+        if (result) {
+            console.log("result", result);
+            return NextResponse.json(result);
+        }
+    } catch (e) {
+        console.error(e);
+        return NextResponse.json({ error: "Failed to fetch data" }, { status: 500 });
+    }
+
+    // FIND IMAGE ONLINE TEMPORARILY
     if (!image_url) {
         return NextResponse.json({ error: "Image URL is required" }, { status: 400 });
     }

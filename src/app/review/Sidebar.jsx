@@ -60,12 +60,12 @@ const SidebarLeft = ({ loading, CaseFiles, setCaseFiles, setFile }) => {
     }
 
     return (
-        <div className=' pt-20 px-5 w-full max-w-[25vw] min-w-[20vw] overflow-hidden bg-linear-90 from-white to-white '>
+        <div className=' bg-blue-600/10 mt-14 pt-6 pb-2 px-5 w-full max-w-[25vw] min-w-[20vw] overflow-hidden '>
 
             <div className=' left-0 top-5  text-white flex flex-col pb-5 items-center justify-between h-[90vh] gap-5 '>
                 <div className='w-full flex flex-col items-center gap-5'>
                     <div className=' pb-4 px-3 rounded-lg w-full text-black font-semibold text-2xl'>
-                        Cases Review
+                        Case List
                         {/* <Table className={""}>
                             <TableBody className={""}>
                                 <TableRow className={"hover:bg-transparent border-0 "}>
@@ -89,7 +89,7 @@ const SidebarLeft = ({ loading, CaseFiles, setCaseFiles, setFile }) => {
                             ) : CaseFiles.length > 0 ? (
                                 CaseFiles.map((filedata, index) => (
                                     <div key={index}
-                                        className={" text-black border backdrop-blur-md p-3 rounded-lg w-full min-h-24 cursor-pointer transition-colors "}
+                                        className={" bg-white text-black border backdrop-blur-md p-3 rounded-lg w-full min-h-24 cursor-pointer transition-colors "}
                                         onClick={() => { return setFile(filedata) }}
                                     >
                                         <div className='w-full flex items-center justify-between'>
@@ -109,8 +109,9 @@ const SidebarLeft = ({ loading, CaseFiles, setCaseFiles, setFile }) => {
                                                     <span className='text-sm bg-blue-700 font-bold text-white px-2 py-0.5 h-fit rounded-3xl '>
                                                         {filedata.ai_result.result === null ? "Pending" : filedata?.ai_result?.result}
                                                     </span>
-                                                    <span className='text-sm  px-3 py-0.5 rounded-3xl '>
-                                                        {filedata.agent_review === null ? "Pending" : filedata?.agent_review === "bad" ? "Policy Violation" : "Good"}
+                                                    {/* pending / good / blocked */}
+                                                    <span className={`text-sm  px-3 py-0.5 rounded-3xl ${filedata.agent_review === null ? "bg-neutral-100 border text-black" : filedata?.agent_review === "blocked" ? "bg-red-500 text-white" : filedata?.agent_review === "pending" ? "bg-neutral-100 border text-black" : "bg-emerald-500 text-white"}`}>
+                                                        {filedata.agent_review === null ? "Pending" : filedata?.agent_review === "blocked" ? "Blocked" : filedata?.agent_review === "pending" ? "Pending" : "Good"}
                                                     </span>
                                                     <span className='text-sm  px-3 py-0.5 rounded-3xl '>
                                                         {filedata?.media_type === "image" ?
@@ -146,7 +147,7 @@ const SidebarLeft = ({ loading, CaseFiles, setCaseFiles, setFile }) => {
                     </div >
                 </div >
 
-                <div className={`w-full flex flex-col gap-2 justify-end border border-black/20 text-black p-3 rounded-xl transition-all overflow-hidden`}>
+                <div className={` bg-white w-full flex flex-col gap-2 justify-end border border-black/20 text-black p-3 rounded-xl transition-all overflow-hidden`}>
                     <div className=' w-full flex gap-2 items-center justify-between rounded-xl transition-colors'>
                         <span>
                             Add Case

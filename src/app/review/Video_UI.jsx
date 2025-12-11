@@ -32,7 +32,7 @@ export default function Result_UI({ results }) {
     }
 
     //-------------------------------------------------
-    const get_chart_data = (duration, person_obj_list, threshold = 0.7) => {
+    const get_chart_data = (duration, person_obj_list, threshold = 1 - 0.7) => {
         let person_prediction_data = []
         // default value 0.7 (if no data at that timestamp (frames in 1 sec))
         for (let i = 0; i <= duration; i++)
@@ -50,7 +50,7 @@ export default function Result_UI({ results }) {
                 // set the value to the average of all values in that second
                 let prediciton_value = prediction_sum / count;
 
-                prediciton_value = normalize_value(prediciton_value, threshold);
+                prediciton_value = normalize_value(1 - prediciton_value, threshold);
                 person_prediction_data[curr_processing_time] = prediciton_value;
                 // reset values with the new time value
                 count = 1;
@@ -80,7 +80,7 @@ export default function Result_UI({ results }) {
 
         // const duration = results["duration"];
         const threshold_for_graph = 0.5; // since we normalize it
-        const threshold = 0.7;
+        const threshold = 1 - 0.7;
 
         for (let person_idx in results["faces_data"]) {
             if (results["faces_data"][person_idx]["indices"].length <= 0) {
@@ -88,7 +88,7 @@ export default function Result_UI({ results }) {
             }
             // console.log("frame chart pass: ", label);
             // const person = results["faces_data"][person];
-            const { person_prediction_data, mean_prediction_value } = get_chart_data(duration, results["faces_data"][person_idx]["indices"], threshold);
+            const { person_prediction_data, mean_prediction_value } = get_chart_data(duration, results["faces_data"][person_idx]["indices"], 0.3);
 
             // console.log("label : ", label);
             // console.log("prediction table : ", person_prediction_data);
@@ -108,13 +108,13 @@ export default function Result_UI({ results }) {
                 ),
                 datasets: [
                     {
-                        label: "Probablility of real",
+                        label: "Probablility of Fake",
                         data: Object.values(person_prediction_data),
                         backgroundColor: Object.values(person_prediction_data).map((pred) => {
-                            return pred >= threshold_for_graph ? "rgba(0,255,0,0.2)" : "rgba(255,0,0,0.2)"
+                            return pred > threshold_for_graph ? "rgba(255,0,0,0.2)" : "rgba(0,255,0,0.2)"
                         }),
                         // borderColor: person.map((val, idx) => { return val.prediciton >= 0 ? "rgba(0,255,0,0.3)" : "rgba(255,0,0,0.3)" }),
-                        // borderWidth: 0.75,
+                        // borderWidth: 0.75,s
                         barPercentage: 1,
                         borderRadius: 100,
                         inflateAmount: 1,
@@ -126,8 +126,8 @@ export default function Result_UI({ results }) {
                         pointRadius: 0,
                         fill: {
                             target: { value: threshold_for_graph },
-                            above: "rgba(0,255,0,0.3)",   // Area above the origin
-                            below: "rgba(255,0,0,0.3)"    // below the origin
+                            above: "rgba(255,0,0,0.3)",   // Area below the origin
+                            below: "rgba(0,255,0,0.3)",   // Area above the origin
                         },
                         lineTension: 0.4,
                         spanGaps: true,
@@ -261,7 +261,7 @@ export default function Result_UI({ results }) {
                                                                     <div
                                                                         key={i}
                                                                         style={{ width: `${width}%`, left: `${start}%` }}
-                                                                        className={` h-full absolute ${v > 0.5 ? 'bg-green-400' : v < 0.5 ? 'bg-red-400' : ''}`}
+                                                                        className={` h-full absolute ${v > 0.5 ? 'bg-red-400' : v < 0.5 ? 'bg-green-400' : ''}`}
                                                                     />
                                                                 );
                                                             })
