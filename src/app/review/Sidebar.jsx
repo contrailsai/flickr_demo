@@ -36,27 +36,33 @@ const SidebarLeft = ({ loading, CaseFiles, setCaseFiles, setFile }) => {
         const data = await response.json();
         console.log(data);
 
-        const strucutre = {
-            "ai_result": {
-                "accuracy": null,
-                "result": null,
-                "type": null
-            },
-            "suspicious_labels": [],
-            "action_labels": [],
-            "agent_review": null,
-            "review_comment": null,
-            "previously_reviewed": false,
-            "marked": false,
-            "faces_data": [],
-            "active": true,
-            "media_type": data.url.includes("mp4") ? "video" : "image",
-            "url": input_url,
-            "image_url": data.url
+        if (data.active !== undefined) {
+            setCaseFiles((prev) => [...prev, data]);
+            e.target.url.value = "";
+            return;
         }
-
-        setCaseFiles((prev) => [...prev, strucutre]);
-        e.target.url.value = "";
+        else {
+            const strucutre = {
+                "ai_result": {
+                    "accuracy": null,
+                    "result": null,
+                    "type": null
+                },
+                "suspicious_labels": [],
+                "action_labels": [],
+                "agent_review": null,
+                "review_comment": null,
+                "previously_reviewed": false,
+                "marked": false,
+                "faces_data": [],
+                "active": true,
+                "media_type": data.url.includes("mp4") ? "video" : "image",
+                "url": input_url,
+                "image_url": data.url
+            }
+            setCaseFiles((prev) => [...prev, strucutre]);
+            e.target.url.value = "";
+        }
     }
 
     return (

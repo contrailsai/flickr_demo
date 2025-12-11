@@ -18,10 +18,9 @@ export async function POST(request) {
                 active: true
             }
         });
-        const result = await data.value;
-        if (result) {
-            console.log("result", result);
-            return NextResponse.json(result);
+        console.log("data", data);
+        if (data) {
+            return NextResponse.json(data);
         }
     } catch (e) {
         console.error(e);
