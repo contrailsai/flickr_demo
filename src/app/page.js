@@ -190,17 +190,14 @@ const page = () => {
                 {/* <div className='text-black font-bold text-xl'>
                     Cases Review
                 </div> */}
-                <div className='h-8'>
-                    <img className='w-full h-full object-cover ' src="flickr_logo.png" alt="flickr" />
+                <div className='h-11'>
+                    <img className='w-full h-full object-cover ' src="logo_long.png" alt="logo" />
                 </div>
-                <div className='flex items-center gap-2'>
-                    <div className=' h-11'>
-                        <img className='w-full h-full object-cover ' src="logo_long.png" alt="logo" />
+                {/* <div className='flex items-center gap-2'>
+                    <div className=' h-8'>
+                        <img className='w-full h-full object-cover ' src="flickr_logo.png" alt="flickr" />
                     </div>
-                    {/* <div className='text-blue-700 font-bold text-3xl'>
-                        Contrails AI
-                    </div> */}
-                </div>
+                </div> */}
             </div>
 
             {/* sidebar */}
